@@ -1,6 +1,6 @@
 import React from "react";
-import { StyleSheet, View, Alert } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import { StyleSheet, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
 import Car from "./assets/car.png";
@@ -16,6 +16,8 @@ export default function App() {
     longitude: -46.867643,
   });
 
+  const mapsRef = React.useRef(null);
+
   async function getLocationPermission() {
     let { status } = await Location.requestForegroundPermissionsAsync();
 
@@ -28,6 +30,13 @@ export default function App() {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     };
+
+    if (mapsRef.current) {
+      mapsRef.current.animateCamera({
+        center: current,
+        zoom: 16,
+      });
+    }
     setOrigin(current);
   }
 
@@ -38,6 +47,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapsRef}
         style={styles.map}
         followsUserLocation
         initialRegion={{
@@ -65,6 +75,7 @@ export default function App() {
           origin={origin}
           destination={destination}
           strokeWidth={4}
+          optimizeWaypoints
         />
         {/* <Polyline coordinates={[origin, destination]} strokeWidth={2} /> */}
       </MapView>
